@@ -24,7 +24,6 @@ const storage = new CloudinaryStorage({
 
 export const upload = multer({ storage }).array('upload_images', 5);
 
-
 export const imageUpload = async(req,res) => {
     try {
         const imageUploadPromises = req.files.map(async (file) => {
