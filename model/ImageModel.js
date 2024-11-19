@@ -5,6 +5,9 @@ const ImageSchema = new Schema(
             images : {
                 type : [String],
             },
+        },
+        {
+            timestamps: true,
         }
 );
 
