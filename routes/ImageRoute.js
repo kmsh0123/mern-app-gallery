@@ -1,5 +1,5 @@
 import {Router} from "express";
-import {deleteImage, deletePhoto, EditImage, getImageById, getImages, imageUpload} from "../controller/ImageController.js";
+import {deleteAllPhoto, deleteImage, deletePhoto, EditImage, getImageById, getImages, imageUpload} from "../controller/ImageController.js";
 
 const router = Router();
 
@@ -12,6 +12,8 @@ router.patch("/edit/:id",EditImage)
 router.delete("/delete/:id",deletePhoto)
 
 router.post("/deleteImage",deleteImage)
+
+router.post("/deleteAllPhoto",deleteAllPhoto)
 
 router.post("/create",imageUpload)
     

@@ -202,3 +202,50 @@ export const deletePhoto = async (req,res)=>{
       });
   }
 }
+
+export const deleteAllPhoto = async (req, res) => {
+  const { ids } = req.body; // Document အတွက် ID များရယူ
+
+  try {
+    // IDs များအလိုက် MongoDB မှ Document များကို ရယူ
+    const imagesToDelete = await ImageModel.find({ _id: { $in: ids } });
+
+    if (imagesToDelete.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No photos found for the provided IDs",
+      });
+    }
+
+    // Cloudinary public IDs ရယူ
+    const publicIds = imagesToDelete.flatMap(image =>
+      image.images?.map(imageUrl => {
+        const parts = imageUrl.split('/');
+        return parts.slice(-2, -1)[0] + '/' + parts.slice(-1)[0].split('.')[0];
+      }) || []
+    );
+
+    if (publicIds.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "No valid Cloudinary URLs found in the provided IDs",
+      });
+    }
+
+    // Cloudinary မှ Public IDs ဖြင့်ဓာတ်ပုံများကို ဖျက်
+    await cloudinary.api.delete_resources(publicIds);
+
+    // MongoDB မှ Document များဖျက်
+    await ImageModel.deleteMany({ _id: { $in: ids } });
+
+    return res.status(200).json({
+      success: true,
+      message: "All images deleted successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message || "An error occurred while deleting photos",
+    });
+  }
+};
